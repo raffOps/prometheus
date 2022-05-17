@@ -10,8 +10,19 @@ networks:
 
 services:
 
+  node:
+    build: app
+    command: node index.js
+    ports:
+      - 3001:3001
+    networks:
+      - back-tier
+    restart: always
+    deploy:
+      mode: global
+
   prometheus:
-    image: prom/prometheus:v2.1.0
+    image: prom/prometheus:latest
     volumes:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
@@ -25,9 +36,11 @@ services:
     links:
       - cadvisor:cadvisor
       - alertmanager:alertmanager
+      - node:node
 #      - pushgateway:pushgateway
     depends_on:
       - cadvisor
+      - node
 #      - pushgateway
     networks:
       - back-tier
